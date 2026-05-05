@@ -1,5 +1,7 @@
 # Confluence Edit Lock
 
+**简体中文** | [English](./README.en.md)
+
 修复 Confluence 经典编辑器在 Chromium 浏览器上「点击空白处页面跳回顶部」的 bug。
 
 ## 功能
