@@ -1,35 +1,63 @@
 # Confluence Edit Lock
 
-**简体中文** | [English](./README.en.md)
+**English** | [简体中文](./README.zh.md)
 
-修复 Confluence 经典编辑器在 Chromium 浏览器上「点击空白处页面跳回顶部」的 bug。
+Fixes the "page jumps to top when clicking empty space" bug in Confluence's classic editor on Chromium browsers.
 
-## 功能
+## Features
 
-- 在 Confluence 编辑页自动启用,消除点击边缘空白时页面跳到顶部的问题
-- 工具栏图标提供「自动 / 强制开 / 强制关」三态切换,图标上的 `ON` 角标表示当前页已激活
+- Automatically activates on Confluence edit pages, preventing the jump-to-top behavior when clicking margins
+- Toolbar icon offers a three-state toggle (Auto / Force on / Force off); an `ON` badge on the icon means the current page is locked
 
-不在编辑页时不做任何事;非 `*confluence*` 域名上不注入。
+Does nothing outside edit pages; never injects on non-`*confluence*` domains.
 
-## 支持的浏览器
+## Applicability
+
+This bug exists in Confluence Server / Data Center using the **classic TinyMCE editor** (the one embedded in `<iframe id="wysiwygTextarea_ifr">`), on Chromium-based browsers only.
+
+- **Affected**: Confluence Server / DC versions before **9.2.11** and before **10.1.0** — Atlassian fixed it upstream in those releases ([CONFSERVER-100547](https://jira.atlassian.com/browse/CONFSERVER-100547))
+- **Not affected**: Confluence Cloud (uses the new Atlaskit editor), Confluence DC 9.2.11+ / 10.1.0+, or any browser that isn't Chromium (Firefox / Safari are fine without this extension)
+
+If your instance is already on a fixed version, you don't need this extension.
+
+## Auto-mode matching rules
+
+The extension only acts when **both** conditions are true:
+
+1. The hostname contains the substring `confluence` (case-insensitive). Examples that match: `confluence.company.com`, `pdconfluence.example.com`, `wiki.confluence.internal`. Examples that don't: `wiki.company.com`, `kb.team.io`.
+2. The URL looks like an edit page **and** an editor DOM node is present on the page.
+
+The URL is considered an edit page if it matches any of:
+
+- `resumedraft.action` (resuming a draft)
+- `?action=edit` or `&action=edit` (classic edit URL)
+- `/edit-v2/` (newer edit route)
+- `/pages/editpage.action`
+- `/pages/createpage.action`
+
+The editor DOM check looks for any of: `iframe#wysiwygTextarea_ifr`, `iframe.tox-edit-area__iframe`, `.ProseMirror`, `[contenteditable='true']`.
+
+If your Confluence host doesn't contain the word `confluence` (e.g. a custom `wiki.company.com`), auto-mode won't trigger — use **Force on** from the toolbar popup.
+
+## Supported browsers
 
 - Chrome 88+
 - Edge 88+
-- 其他 Chromium 内核浏览器(Brave / Arc / Vivaldi / Opera 等)
+- Other Chromium-based browsers (Brave / Arc / Vivaldi / Opera, etc.)
 
-Firefox / Safari 没有这个 bug,不需要装。
+Firefox and Safari don't have this bug — no need to install.
 
-## 安装
+## Installation
 
 ```bash
 git clone https://github.com/ydbdyds/lock-confluence.git
 ```
 
-1. 打开 `chrome://extensions`(Edge 是 `edge://extensions`)
-2. 右上角打开「开发者模式」
-3. 点「加载已解压扩展程序」,选择克隆下来的目录
+1. Open `chrome://extensions` (or `edge://extensions` on Edge)
+2. Enable "Developer mode" in the top-right corner
+3. Click "Load unpacked" and select the cloned directory
 
-打开 Confluence 编辑页,工具栏扩展图标出现 `ON` 角标即表示生效。
+Open a Confluence edit page — the `ON` badge on the toolbar icon means it's active.
 
 ## License
 
